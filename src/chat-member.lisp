@@ -1,8 +1,10 @@
-(uiop:define-package #:cl-telegram-bot/chat-member
+(defpackage #:cl-telegram-bot/chat-member
     (:use #:cl)
   (:import-from #:cl-telegram-bot/chat
                 #:chat
                 #:make-chat)
+  (:import-from #:cl-telegram-bot/pipeline
+                #:process)
   (:import-from #:cl-telegram-bot/user
                 #:make-user)
   (:import-from :cl-telegram-bot/utils
@@ -10,9 +12,29 @@
                 #:symbol-to-keyword
                 #:get-property-values
                 #:raw-data-to-initargs)
-  (:export #:chat-member-meber
-           #:chat-member-updated))
+  (:export #:get-raw-data
+           #:chat-member-meber
+           #:get-chat-member-member-status
+           #:get-chat-member-member-user
+           #:make-chat-member-member
+           #:chat-member-updated
+           #:make-chat-member-updated
+           #:get-chat-member-updated-chat
+           #:get-chat-member-updated-from
+           #:get-chat-member-updated-date
+           #:get-chat-member-updated-old-chat-member
+           #:get-chat-member-updated-new-chat-member
+           #:get-chat-member-updated-invite-link
+           #:get-chat-member-updated-via-chat-folder-invite-link
+           #:on-chat-member-updated))
 (in-package cl-telegram-bot/chat-member)
+
+
+(defvar *current-bot* nil
+  "The current bot.")
+
+(defvar *current-chat-member-updated* nil
+  "The current CHAT-MEMBER-UPDATED.")
 
 
 (defclass chat-member-member ()
@@ -103,3 +125,15 @@
                            :|is_bot| NIL :|id| 456)
     :|chat|
     (:|type| "private" :|last_name| "A" :|first_name| "B" :|id| 456))))
+
+
+(defgeneric on-chat-member-updated (bot chat-member-updated)
+  (:documentation
+   "Handle CHAT-MEMBER-UPDATED. More info:
+<https://core.telegram.org/bots/api#chatmemberupdated>."))
+
+(defmethod process ((bot t) (chat-member-updated chat-member-updated))
+  "Process CHAT-MEMBER-UPDATED."
+  (log:debug "Processing chat-member-updated." bot chat-member-updated)
+  (on-chat-member-updated bot chat-member-updated)
+  (values))

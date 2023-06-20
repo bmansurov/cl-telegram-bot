@@ -1,4 +1,4 @@
-(uiop:define-package #:cl-telegram-bot/user
+(defpackage #:cl-telegram-bot/user
     (:use #:cl)
   (:import-from :kebab
                 #:to-snake-case)
@@ -8,7 +8,19 @@
                 #:get-property-values
                 #:raw-data-to-initargs)
   (:export #:user
-           #:make-user))
+           #:make-user
+           #:get-user-id
+           #:get-user-is-bot
+           #:get-user-first-name
+           #:get-user-last-name
+           #:get-user-username
+           #:get-user-language-code
+           #:get-user-is-premium
+           #:get-user-added-to-attachment-menu
+           #:get-user-can-join-groups
+           #:get-user-can-read-all-group-messages
+           #:get-user-supports-inline-queries
+           #:get-raw-data))
 (in-package cl-telegram-bot/user)
 
 (defclass user ()

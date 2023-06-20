@@ -676,7 +676,7 @@ https://core.telegram.org/bots/api#sendsticker"
 
 
 
-;; TODO: сделать так чтобы def-telegram-call работал c 
+;; TODO: сделать так чтобы def-telegram-call работал c
 ;; (def-telegram-call send-message (chat text &key
 ;;                                       parse-mode
 ;;                                       disable-web-page-preview
@@ -801,10 +801,10 @@ https://core.telegram.org/bots/api#sendsticker"
    If (reply \"text\") is called during processing of some entity or inside the on-message, then
    whole processing pipeline will be stopped and next update will be processed."
   (log:debug "Processing message" message)
-  
+
   (let ((*current-bot* bot)
         (*current-message* message))
-    
+
     (handler-case
         (progn (loop for entity in (get-entities message)
                      do (process bot entity))

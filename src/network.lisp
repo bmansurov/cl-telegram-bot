@@ -28,10 +28,9 @@
   "Perform HTTP request to 'name API method with 'options JSON-encoded object."
   (declare (ignore streamp))
 
-  (let ((url (concatenate 'string (get-endpoint bot) name)))
-    (log:debug "Posting data to"
-               (obfuscate url)
-               options)
+  (let ((url (concatenate 'string (get-endpoint bot) name))
+        (options-str (format nil "~S" options)))
+    (log:debug "Posting data to" (obfuscate url) options-str)
     (let* ((max-timeout (* timeout 10))
            (processed-options (loop for (key value)
                                       on (alexandria:remove-from-plist options :timeout :streamp)
@@ -55,7 +54,8 @@
                                :connect-timeout max-timeout)))
            (data (jonathan:parse response)))
       (unless (getf data :|ok|)
-        (log:error "Wrong data received from the server" data)
+        (let ((data-str (format nil "~S" data)))
+          (log:error "Wrong data received from the server" data-str))
         (error 'request-error :what data))
 
       (getf data :|result|))))

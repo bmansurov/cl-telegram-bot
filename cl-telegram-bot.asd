@@ -18,6 +18,7 @@
                  (:file "chat" :depends-on ("network"
                                             "telegram-call"))
                  (:file "chat-member" :depends-on ("chat"
+                                                   "pipeline"
                                                    "user"
                                                    "utils"))
                  (:file "entities/command" :depends-on ("entities/core"
@@ -46,7 +47,8 @@
                  (:file "stickers")
                  (:file "telegram-call" :depends-on ("network"
                                                      "utils"))
-                 (:file "update" :depends-on ("message"
+                 (:file "update" :depends-on ("chat-member"
+                                              "message"
                                               "network"
                                               "pipeline"))
                  (:file "user" :depends-on ("utils"))

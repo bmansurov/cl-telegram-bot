@@ -1,0 +1,10 @@
+* API
+
+** [[https://core.telegram.org/bots/api#update][Update]]
+*** [[https://core.telegram.org/bots/api#chatmemberupdated][my_chat_member]]
+    #+begin_src lisp
+      (defmethod on-chat-member-updated
+          ((bot cl-telegram-bot/bot:bot)
+           (chat-member-updated
+            cl-telegram-bot/chat-member:on-chat-member-updated)))
+    #+end_src

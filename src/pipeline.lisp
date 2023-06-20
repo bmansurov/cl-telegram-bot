@@ -1,7 +1,6 @@
 (defpackage #:cl-telegram-bot/pipeline
   (:use #:cl)
-  (:export
-   #:process))
+  (:export #:process))
 (in-package cl-telegram-bot/pipeline)
 
 

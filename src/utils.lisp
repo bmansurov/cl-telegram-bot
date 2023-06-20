@@ -1,4 +1,4 @@
-(uiop:define-package #:cl-telegram-bot/utils
+(defpackage #:cl-telegram-bot/utils
   (:use #:cl)
   (:import-from #:arrows
                 #:->)
