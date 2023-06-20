@@ -83,7 +83,7 @@
   (loop
     do (loop for update
                in (restart-case
-                      (get-updates bot :timeout 10)
+                      (get-updates bot :timeout 30)
                     (continue-processing (&optional delay)
                       :report "Continue processing updates from Telegram"
                       (when delay (sleep delay))
