@@ -1,4 +1,4 @@
-(defpackage #:cl-telegram-bot/update
+(uiop:define-package #:cl-telegram-bot/update
   (:use #:cl)
   (:import-from #:log4cl)
   (:import-from #:cl-telegram-bot/message
@@ -28,7 +28,9 @@
              :reader get-raw-data)))
 
 
+
 (defun make-update (data)
+  (log:info "make-update" data)
   (let ((message-data (getf data :|message|)))
     (if message-data
         (make-instance 'update
@@ -41,6 +43,64 @@
                               :id (getf data :|update_id|)
                               :payload nil
                               :raw-data data)))))
+#+nil
+(:|message|
+ (:|entities| ((:|type| "bot_command" :|length| 6 :|offset| 0)) :|text|
+  "/start" :|date| 1687221822 :|chat|
+  (:|type| "private" :|last_name| "M" :|first_name| "Bahodir" :|id| 151765246)
+  :|from|
+  (:|language_code| "en" :|last_name| "M" :|first_name| "Bahodir" :|is_bot| NIL
+   :|id| 151765246)
+  :|message_id| 825)
+ :|update_id| 647952711)
+
+#+nil
+(:|message|
+  (:|text| "test" :|date| 1687221881
+   :|chat|
+    (:|type| "private" :|last_name|
+      "M" :|first_name| "Bahodir"
+                       :|id| 151765246)
+                  :|from|
+    (:|language_code| "en"
+      :|last_name| "M" :|first_name|
+      "Bahodir" :|is_bot| NIL :|id|
+      151765246)
+   :|message_id| 829)
+  :|update_id| 647952712)
+
+#+nil
+(:|my_chat_member|
+ (:|new_chat_member|
+  (:|status| "member" :|user|
+   (:|username| "oliboli2_bot" :|first_name| "Oli Boli 2" :|is_bot| T :|id|
+    5838283419))
+  :|old_chat_member|
+  (:|until_date| 0 :|status| "kicked" :|user|
+   (:|username| "oliboli2_bot" :|first_name| "Oli Boli 2" :|is_bot| T :|id|
+    5838283419))
+  :|date| 1687221822 :|from|
+  (:|language_code| "en" :|last_name| "M" :|first_name| "Bahodir" :|is_bot| NIL
+   :|id| 151765246)
+  :|chat|
+  (:|type| "private" :|last_name| "M" :|first_name| "Bahodir" :|id| 151765246))
+ :|update_id| 647952710)
+#+nil
+(:|my_chat_member|
+ (:|new_chat_member|
+  (:|status| "member" :|user|
+   (:|username| "oliboli2_bot" :|first_name| "Oli Boli 2" :|is_bot| T :|id|
+    5838283419))
+  :|old_chat_member|
+  (:|until_date| 0 :|status| "kicked" :|user|
+   (:|username| "oliboli2_bot" :|first_name| "Oli Boli 2" :|is_bot| T :|id|
+    5838283419))
+  :|date| 1687221822 :|from|
+  (:|language_code| "en" :|last_name| "M" :|first_name| "Bahodir" :|is_bot| NIL
+   :|id| 151765246)
+  :|chat|
+  (:|type| "private" :|last_name| "M" :|first_name| "Bahodir" :|id| 151765246))
+ :|update_id| 647952710)
 
 
 (defun get-updates (bot &key limit timeout)

@@ -17,6 +17,9 @@
                 ((:file "bot")
                  (:file "chat" :depends-on ("network"
                                             "telegram-call"))
+                 (:file "chat-member" :depends-on ("chat"
+                                                   "user"
+                                                   "utils"))
                  (:file "entities/command" :depends-on ("entities/core"
                                                         "message"
                                                         "pipeline"
@@ -46,6 +49,7 @@
                  (:file "update" :depends-on ("message"
                                               "network"
                                               "pipeline"))
+                 (:file "user" :depends-on ("utils"))
                  (:file "utils")
                  (:file "webhooks"))))
   :description ""
