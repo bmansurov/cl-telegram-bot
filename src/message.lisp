@@ -808,7 +808,7 @@ https://core.telegram.org/bots/api#sendsticker"
     (handler-case
         (progn (loop for entity in (get-entities message)
                      do (process bot entity))
-
+               (log:info "New message: ~S." (get-raw-data message))
                (on-message bot
                            (get-text message)))
       (reply-immediately (condition)
