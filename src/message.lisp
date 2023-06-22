@@ -5,6 +5,11 @@
                 #:get-chat-id
                 #:make-chat
                 #:chat)
+  (:import-from #:cl-telegram-bot/message-entity
+                #:message-entity
+                #:message-entity-length
+                #:message-entity-offset
+                #:message-entity-type)
   (:import-from #:cl-telegram-bot/network
                 #:make-request)
   (:import-from #:cl-telegram-bot/bot
@@ -768,17 +773,50 @@ https://core.telegram.org/bots/api#sendsticker"
   (log:warn "Ignoring MESSAGE. Create ON-MESSAGE that to process it.")
   (values))
 
+(defun bot-command-p (message)
+  "Whether MESSAGE contains a single message-entity with an offset of 0
+and of type \"bot_command\"."
+  (let ((entities (get-entities message)))
+    (when (= (length entities) 1)
+      (let* ((entity (car entities))
+             (offset (message-entity-offset entity)))
+        (and offset
+             (zerop offset)
+             (string-equal (message-entity-type entity)
+                           "bot_command"))))))
+
+(defun bot-command-keyword-and-text (message)
+  "If MESSAGE is a bot command, return the command keyword and text."
+  (if (bot-command-p message)
+      (let* ((entity (car (get-entities message)))
+             (text (get-text message))
+             (offset (message-entity-offset entity))
+             (length (message-entity-length entity)))
+        (values (alexandria:make-keyword
+                 (string-upcase
+                  (subseq text (1+ offset) (+ offset length))))
+                (string-trim " " (subseq text (+ offset length)))))
+      (values)))
+
+(defgeneric on-command (bot message keywrod text)
+  (:documentation "Handler for a MESSAGE-ENTITY of type \"BOT_COMMAND\" for a given
+MESSAGE from BOT."))
+
+(defmethod on-command ((bot t) (message message) keyword text)
+  (declare (ignore bot message keyword text))
+  (log:warn "Ignoring COMMAND. Create ON-COMMAND that to process it.")
+  (values))
+
 (defmethod process ((bot t) (message message))
   "Call ON-MESSAGE with BOT and MESSAGE. If REPLY is called inside
 ON-MESSAGE, then whole processing pipeline will be stopped and next
 update will be processed."
   (log:debug "Processing message" message)
   (handler-case
-      (progn
-        (mapcar #'(lambda (e)
-                    (print (cl-telegram-bot/message-entity:message-entity-type e))
-                    (fresh-line))
-                (get-entities message))
+      (multiple-value-bind (keyword text)
+          (bot-command-keyword-and-text message)
+        (when (and keyword text)
+          (on-command bot message keyword text))
         (on-message bot message))
     (reply-immediately (condition)
       (log:debug "Replying to message: ~S." message)

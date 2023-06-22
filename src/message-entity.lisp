@@ -52,3 +52,4 @@
                      '(user)))))
       (setf (slot-value message-entity 'user) user)
       message-entity)))
+
