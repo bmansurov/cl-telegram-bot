@@ -30,13 +30,6 @@
 (in-package cl-telegram-bot/chat-member)
 
 
-(defvar *current-bot* nil
-  "The current bot.")
-
-(defvar *current-chat-member-updated* nil
-  "The current CHAT-MEMBER-UPDATED.")
-
-
 (defclass chat-member-member ()
   ((status :initarg :status
            :reader get-chat-member-member-status)

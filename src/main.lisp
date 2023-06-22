@@ -11,8 +11,6 @@
   (:import-from #:cl-telegram-bot/message
                 #:on-message
                 #:reply)
-  (:import-from #:cl-telegram-bot/entities/command
-                #:on-command)
   (:import-from #:trivial-backtrace
                 #:print-backtrace)
   ;; This package exports only essential symbols, needed
@@ -36,13 +34,12 @@
 
   (log:info "Starting thread to process updates for" bot)
   (flet ((continue-processing-if-not-debug (condition)
-           (let ((restart (find-restart 'cl-telegram-bot/update::continue-processing
-                                        condition)))
+           (let ((restart (find-restart
+                           'cl-telegram-bot/update::continue-processing
+                           condition)))
              (when restart
-               (let ((traceback (print-backtrace
-                                 condition :output nil)))
+               (let ((traceback (print-backtrace condition :output nil)))
                  (log:error "Unable to process Telegram updates" traceback))
-               
                (unless debug
                  (invoke-restart restart delay-between-retries))))))
     (setf (getf *threads* bot)

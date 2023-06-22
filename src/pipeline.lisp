@@ -11,10 +11,7 @@
 
                    For each update we call:
                      process(update)
-                     process(update.payload)
-                     For each entity in payload:
-                       process(entity)
-                   "))
+                     process(update.payload)"))
 
 
 (defmethod process (bot object)

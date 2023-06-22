@@ -5,16 +5,12 @@
                 #:get-chat-id
                 #:make-chat
                 #:chat)
-  (:import-from #:cl-telegram-bot/entities/core
-                #:make-entity)
   (:import-from #:cl-telegram-bot/network
                 #:make-request)
-  (:import-from #:cl-telegram-bot/pipeline
-                #:process)
   (:import-from #:cl-telegram-bot/bot
                 #:bot)
-  (:import-from #:serapeum
-                #:defvar-unbound)
+  (:import-from #:cl-telegram-bot/pipeline
+                #:process)
   (:import-from #:cl-telegram-bot/telegram-call
                 #:def-telegram-call)
   (:export #:send-message
@@ -30,6 +26,7 @@
            #:forward-message
            #:make-message
            #:get-text
+           #:get-message-from
            #:get-caption
            #:get-raw-data
            #:get-chat
@@ -50,7 +47,6 @@
            #:get-file-size
            #:get-mime-type
            #:on-message
-           #:get-current-chat
            #:get-performer
            #:get-title
            #:get-is-animated
@@ -83,20 +79,15 @@
            #:get-message-id))
 (in-package cl-telegram-bot/message)
 
-
-(defvar-unbound *current-bot*
-  "An internal variable to hold current bot for replying.")
-
-(defvar-unbound *current-message*
-  "An internal variable to hold current message for replying.")
-
-
 (defclass message ()
   ((id :initarg :id
        :reader get-message-id)
    (text :initarg :text
          :type (or null string)
          :reader get-text)
+   (from :initarg :from
+         :type (or null 'cl-telegram-bot/user:user)
+         :reader get-message-from)
    ;; Caption for file messages
    (caption :initarg :caption
             :type (or null string)
@@ -127,19 +118,24 @@ administrators, information about the original sender chat.")))
 
 (defmethod initialize-instance :after ((message message) &key data &allow-other-keys)
   (when data
-    (setf (slot-value message 'id) (getf data :|message_id|)
-          (slot-value message 'text) (getf data :|text|)
-          (slot-value message 'chat) (make-chat (getf data :|chat|))
-          (slot-value message 'entities) (mapcar (lambda (item)
-                                                   (make-entity message item))
-                                                 (getf data :|entities|))
-          (slot-value message 'raw-data) data
-          (slot-value message 'forward-from-chat) (when (getf data :|forward_from_chat|)
-                                                    (make-chat (getf data :|forward_from_chat|)))
-          (slot-value message 'forward-from) (when (getf data :|forward_from|)
-                                               (make-chat (getf data :|forward_from|)))
-          (slot-value message 'forward-sender-name) (getf data :|forward_sender_name|)
-          (slot-value message 'caption) (getf data :|caption|))))
+    (setf (slot-value message 'id) (getf data :|message_id|))
+    (setf (slot-value message 'text) (getf data :|text|))
+    (setf (slot-value message 'from)
+          (cl-telegram-bot/user:make-user (getf data :|from|)))
+    (setf (slot-value message 'chat) (make-chat (getf data :|chat|)))
+    (setf (slot-value message 'entities)
+          (mapcar #'cl-telegram-bot/message-entity:make-message-entity
+                  (getf data :|entities|)))
+    (setf (slot-value message 'raw-data) data)
+    (setf (slot-value message 'forward-from-chat)
+          (when (getf data :|forward_from_chat|)
+            (make-chat (getf data :|forward_from_chat|))))
+    (setf (slot-value message 'forward-from)
+          (when (getf data :|forward_from|)
+            (make-chat (getf data :|forward_from|))))
+    (setf (slot-value message 'forward-sender-name)
+          (getf data :|forward_sender_name|))
+    (setf (slot-value message 'caption) (getf data :|caption|))))
 
 (defclass temporal ()
   ((duration
@@ -343,10 +339,10 @@ the file.")
          options))
 
 (defgeneric send-photo (bot chat photo
-                       &rest options
-                       &key caption parse-mode caption-entities
-                         disable-notification protect-content reply-to-message-id
-                         allow-sending-without-reply reply-markup))
+                        &rest options
+                        &key caption parse-mode caption-entities
+                          disable-notification protect-content reply-to-message-id
+                          allow-sending-without-reply reply-markup))
 
 (defmethod send-photo (bot chat (photo string)
                        &rest options
@@ -403,11 +399,11 @@ https://core.telegram.org/bots/api#sendaudio"
          options))
 
 (defgeneric send-audio (bot chat audio
-                       &rest options
-                       &key caption parse-mode caption-entities
-                         duration performer title thumb
-                         disable-notification protect-content reply-to-message-id
-                         allow-sending-without-reply reply-markup))
+                        &rest options
+                        &key caption parse-mode caption-entities
+                          duration performer title thumb
+                          disable-notification protect-content reply-to-message-id
+                          allow-sending-without-reply reply-markup))
 
 (defmethod send-audio (bot chat (audio audio)
                        &rest options
@@ -446,11 +442,11 @@ https://core.telegram.org/bots/api#senddocument"
          options))
 
 (defgeneric send-document (bot chat document
-                          &rest options
-                          &key caption parse-mode caption-entities
-                            disable-content-type-detection thumb
-                            disable-notification protect-content reply-to-message-id
-                            allow-sending-without-reply reply-markup))
+                           &rest options
+                           &key caption parse-mode caption-entities
+                             disable-content-type-detection thumb
+                             disable-notification protect-content reply-to-message-id
+                             allow-sending-without-reply reply-markup))
 
 (defmethod send-document (bot chat (document document)
                           &rest options
@@ -489,11 +485,11 @@ https://core.telegram.org/bots/api#sendvideo"
          options))
 
 (defgeneric send-video (bot chat video
-                       &rest options
-                       &key caption parse-mode caption-entities
-                         duration width height thumb
-                         disable-notification protect-content reply-to-message-id
-                         allow-sending-without-reply reply-markup))
+                        &rest options
+                        &key caption parse-mode caption-entities
+                          duration width height thumb
+                          disable-notification protect-content reply-to-message-id
+                          allow-sending-without-reply reply-markup))
 
 (defmethod send-video (bot chat (video video)
                        &rest options
@@ -532,11 +528,11 @@ https://core.telegram.org/bots/api#sendanimation"
          options))
 
 (defgeneric send-animation (bot chat animation
-                           &rest options
-                           &key caption parse-mode caption-entities
-                             duration width height thumb
-                             disable-notification protect-content reply-to-message-id
-                             allow-sending-without-reply reply-markup)
+                            &rest options
+                            &key caption parse-mode caption-entities
+                              duration width height thumb
+                              disable-notification protect-content reply-to-message-id
+                              allow-sending-without-reply reply-markup)
   (:documentation "Sends animation to a chat."))
 
 (defmethod send-animation (bot chat (animation animation)
@@ -555,11 +551,11 @@ https://core.telegram.org/bots/api#sendanimation"
   (apply #'send-video bot chat (get-file-id animation) options))
 
 (defgeneric send-video-note (bot chat video-note
-                            &rest options
-                            &key caption parse-mode caption-entities
-                              duration length thumb
-                              disable-notification protect-content reply-to-message-id
-                              allow-sending-without-reply reply-markup))
+                             &rest options
+                             &key caption parse-mode caption-entities
+                               duration length thumb
+                               disable-notification protect-content reply-to-message-id
+                               allow-sending-without-reply reply-markup))
 
 (defmethod send-video-note (bot chat (video-note string)
                             &rest options
@@ -598,11 +594,11 @@ https://core.telegram.org/bots/api#sendvideonote"
   (apply #'send-video-note bot chat (get-file-id video-note) options))
 
 (defgeneric send-voice (bot chat voice
-                       &rest options
-                       &key caption parse-mode caption-entities
-                         duration
-                         disable-notification protect-content reply-to-message-id
-                         allow-sending-without-reply reply-markup))
+                        &rest options
+                        &key caption parse-mode caption-entities
+                          duration
+                          disable-notification protect-content reply-to-message-id
+                          allow-sending-without-reply reply-markup))
 
 (defmethod send-voice (bot chat (voice string)
                        &rest options
@@ -701,11 +697,11 @@ https://core.telegram.org/bots/api#sendsticker"
 (defun forward-message (bot chat from-chat message &key disable-notification)
   "https://core.telegram.org/bots/api#forwardmessage"
   (let ((options
-         (append (list :|chat_id| (get-chat-id chat)
-                       :|from_chat_id| (get-chat-id from-chat)
-                       :|message_id| (get-message-id message))
-                 (when disable-notification
-                   (list :|disable_notification| t)))))
+          (append (list :|chat_id| (get-chat-id chat)
+                        :|from_chat_id| (get-chat-id from-chat)
+                        :|message_id| (get-message-id message))
+                  (when disable-notification
+                    (list :|disable_notification| t)))))
     (apply #'make-request bot "forwardMessage" options)))
 
 ;; TODO: refactor
@@ -751,79 +747,50 @@ https://core.telegram.org/bots/api#sendsticker"
 
 (define-condition reply-immediately ()
   ((text :initarg :text
-         :reader get-text)
+         :reader get-reply-text)
    (args :initarg :args
-         :reader get-rest-args)))
+         :reader get-reply-args)))
+
+(defun reply (text &rest args &key parse-mode disable-web-page-preview
+                                disable-notification
+                                reply-markup)
+  "Reply with TEXT."
+  (declare (ignorable parse-mode disable-web-page-preview
+                      disable-notification reply-markup))
+  (signal 'reply-immediately :text text :args args))
 
 
-(defun reply (text
-              &rest args
-              &key
-                parse-mode
-                disable-web-page-preview
-                disable-notification
-                reply-to-message-id
-                reply-markup)
-  (declare (ignorable parse-mode
-                      disable-web-page-preview
-                      disable-notification
-                      reply-to-message-id
-                      reply-markup))
-  "Works like a send-message, but only when an incoming message is processed.
-   Automatically sends reply to a chat from where current message came from."
-  (unless (and (boundp '*current-bot*)
-               (boundp '*current-message*))
-    (error "Seems (reply ~S) was called outside of processing pipeline, because no current message is available."
-           text))
+(defgeneric on-message (bot message)
+  (:documentation "Handler for an incoming MESSAGE from BOT."))
 
-  (signal 'reply-immediately
-          :text text
-          :args args))
-
-
-(defgeneric on-message (bot text)
-  (:documentation "This method gets called with raw text from the message.
-                   By default it does nothing."))
-
-
-(defmethod on-message ((bot t) text)
-  (declare (ignorable text))
-  (log:warn "Ignoring messages's text. Define on-message method to process it.")
+(defmethod on-message ((bot t) (message message))
+  (declare (ignore bot message))
+  (log:warn "Ignoring MESSAGE. Create ON-MESSAGE that to process it.")
   (values))
-
 
 (defmethod process ((bot t) (message message))
-  "By default, just calls `process' on each entity. And after that calls (on-message bot text).
-
-   This method binds its arguments to *current-bot* and *current-message*
-   to make it easier to use (reply \"text\") in 99% usecases.
-
-   If (reply \"text\") is called during processing of some entity or inside the on-message, then
-   whole processing pipeline will be stopped and next update will be processed."
+  "Call ON-MESSAGE with BOT and MESSAGE. If REPLY is called inside
+ON-MESSAGE, then whole processing pipeline will be stopped and next
+update will be processed."
   (log:debug "Processing message" message)
-
-  (let ((*current-bot* bot)
-        (*current-message* message))
-
-    (handler-case
-        (progn (loop for entity in (get-entities message)
-                     do (process bot entity))
-               ;; (log:info "New message: ~S." (get-raw-data message))
-               (on-message bot
-                           (get-text message)))
-      (reply-immediately (condition)
-        (log:debug "Replying to" *current-message*)
+  (handler-case
+      (progn
+        (mapcar #'(lambda (e)
+                    (print (cl-telegram-bot/message-entity:message-entity-type e))
+                    (fresh-line))
+                (get-entities message))
+        (on-message bot message))
+    (reply-immediately (condition)
+      (log:debug "Replying to message: ~S." message)
+      (let ((args
+              (append `(:reply-to-message-id ,(get-message-id message))
+                      (get-reply-args condition))))
         (apply #'send-message
-               *current-bot*
-               (get-chat *current-message*)
-               (get-text condition)
-               (get-rest-args condition)))))
+               bot
+               (get-chat message)
+               (get-reply-text condition)
+               args))))
   (values))
 
 
-(defun get-current-chat ()
-  "Returns a chat where currently processing message was received."
-  (unless (boundp '*current-message*)
-    (error "Seems (get-current-chat) was called outside of processing pipeline, because no current message is available."))
 
-  (get-chat *current-message*))

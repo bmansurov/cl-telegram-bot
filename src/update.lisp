@@ -98,6 +98,7 @@
 
 (defmethod process ((bot t) (update update))
   "By default, just calls `process' on the payload."
-  (log:debug "Processing update" update)
+  (log:debug "Processing update: ~S" update)
   (let ((payload (get-payload update)))
+    (log:debug "Processing payload ~S for bot ~S." payload bot)
     (process bot payload)))

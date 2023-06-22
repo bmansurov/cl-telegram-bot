@@ -21,25 +21,24 @@
                                                    "pipeline"
                                                    "user"
                                                    "utils"))
-                 (:file "entities/command" :depends-on ("entities/core"
-                                                        "message"
-                                                        "pipeline"
-                                                        "utils"))
-                 (:file "entities/core" :depends-on ("utils"))
                  (:file "files")
                  (:file "game")
                  (:file "inline")
                  (:file "inline-keyboard")
-                 (:file "main"  :depends-on ("entities/command"
-                                             "entities/core"
+                 (:file "main"  :depends-on ("message-entity"
                                              "message"
                                              "update"))
                  (:file "media")
-                 (:file "message" :depends-on ("entities/core"
+                 (:file "message" :depends-on ("chat"
+                                               "message-entity"
                                                "network"
                                                "pipeline"
                                                "telegram-call"
+                                               "user"
                                                "utils"))
+                 (:file "message-entity" :depends-on ("pipeline"
+                                                      "user"
+                                                      "utils"))
                  (:file "network" :depends-on ("utils"))
                  (:file "payments")
                  (:file "pipeline")
