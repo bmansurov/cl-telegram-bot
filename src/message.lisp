@@ -32,7 +32,7 @@
            #:forward-message
            #:make-message
            #:get-text
-           #:get-message-from
+           #:message-from
            #:get-caption
            #:get-raw-data
            #:get-chat
@@ -53,6 +53,7 @@
            #:get-file-size
            #:get-mime-type
            #:on-message
+           #:on-command
            #:get-performer
            #:get-title
            #:get-is-animated
@@ -82,18 +83,19 @@
            #:unispatial
            #:spatial
            #:temporal
-           #:get-message-id))
+           #:message-id
+           #:sender-id))
 (in-package cl-telegram-bot/message)
 
 (defclass message ()
   ((id :initarg :id
-       :reader get-message-id)
+       :reader message-id)
    (text :initarg :text
          :type (or null string)
          :reader get-text)
    (from :initarg :from
          :type (or null 'cl-telegram-bot/user:user)
-         :reader get-message-from)
+         :reader message-from)
    ;; Caption for file messages
    (caption :initarg :caption
             :type (or null string)
@@ -705,7 +707,7 @@ https://core.telegram.org/bots/api#sendsticker"
   (let ((options
           (append (list :|chat_id| (get-chat-id chat)
                         :|from_chat_id| (get-chat-id from-chat)
-                        :|message_id| (get-message-id message))
+                        :|message_id| (message-id message))
                   (when disable-notification
                     (list :|disable_notification| t)))))
     (apply #'make-request bot "forwardMessage" options)))
@@ -748,7 +750,7 @@ https://core.telegram.org/bots/api#sendsticker"
   "https://core.telegram.org/bots/api#deletemessage"
   (make-request bot "deleteMessage"
                 :|chat_id| (get-chat-id chat)
-                :|message_id| (get-message-id message)))
+                :|message_id| (message-id message)))
 
 
 (define-condition reply-immediately ()
@@ -822,7 +824,7 @@ update will be processed."
     (reply-immediately (condition)
       (log:debug "Replying to message: ~S." message)
       (let ((args
-              (append `(:reply-to-message-id ,(get-message-id message))
+              (append `(:reply-to-message-id ,(message-id message))
                       (get-reply-args condition))))
         (apply #'send-message
                bot
@@ -831,5 +833,7 @@ update will be processed."
                args))))
   (values))
 
-
+(defun sender-id (message)
+  "Return the ID of the sender of MESSAGE."
+  (ctb/user:user-id (message-from message)))
 

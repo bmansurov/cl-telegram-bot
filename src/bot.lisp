@@ -1,5 +1,6 @@
 (defpackage :cl-telegram-bot/bot
   (:use #:cl)
+  (:nicknames #:ctb/bot)
   (:import-from #:log4cl)
   (:import-from #:dexador)
   (:import-from #:jonathan)
@@ -66,5 +67,4 @@
       (bot stream :type t)
     (format stream
             "id=~A" (get-last-update-id bot))))
-
 

@@ -1,5 +1,6 @@
 (defpackage #:cl-telegram-bot/chat-member
     (:use #:cl)
+    (:nicknames #:ctb/chat-member)
   (:import-from #:cl-telegram-bot/chat
                 #:chat
                 #:make-chat)

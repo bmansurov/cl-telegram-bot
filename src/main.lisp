@@ -1,5 +1,6 @@
 (defpackage #:cl-telegram-bot
   (:use #:cl)
+  (:nicknames :ctb)
   (:import-from #:bordeaux-threads
                 #:make-thread
                 #:destroy-thread)
