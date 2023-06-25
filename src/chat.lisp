@@ -1,5 +1,6 @@
 (defpackage #:cl-telegram-bot/chat
   (:use #:cl)
+  (:nicknames :ctb/chat)
   (:import-from #:closer-mop
                 #:class-slots
                 #:slot-definition-initargs)

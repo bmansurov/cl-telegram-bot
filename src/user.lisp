@@ -1,5 +1,6 @@
 (defpackage #:cl-telegram-bot/user
     (:use #:cl)
+    (:nicknames :ctb/user)
   (:import-from :kebab
                 #:to-snake-case)
   (:import-from :cl-telegram-bot/utils
