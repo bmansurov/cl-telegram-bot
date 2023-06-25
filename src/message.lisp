@@ -34,7 +34,7 @@
            #:get-text
            #:message-from
            #:get-caption
-           #:get-raw-data
+           #:message-raw-data
            #:get-chat
            #:get-entities
            #:get-forward-from
@@ -109,7 +109,7 @@
              :type list
              :reader get-entities)
    (raw-data :initarg :raw-data
-             :reader get-raw-data)
+             :reader message-raw-data)
    (forward-from :initarg :forward-from
                  :type (or null chat)
                  :reader get-forward-from

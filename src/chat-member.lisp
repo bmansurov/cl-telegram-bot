@@ -13,31 +13,32 @@
                 #:symbol-to-keyword
                 #:get-property-values
                 #:raw-data-to-initargs)
-  (:export #:get-raw-data
-           #:chat-member-meber
-           #:get-chat-member-member-status
-           #:get-chat-member-member-user
+  (:export #:chat-member-meber
+           #:chat-member-member-status
+           #:chat-member-member-user
+           #:chat-member-member-raw-data
            #:make-chat-member-member
            #:chat-member-updated
            #:make-chat-member-updated
-           #:get-chat-member-updated-chat
-           #:get-chat-member-updated-from
-           #:get-chat-member-updated-date
-           #:get-chat-member-updated-old-chat-member
-           #:get-chat-member-updated-new-chat-member
-           #:get-chat-member-updated-invite-link
-           #:get-chat-member-updated-via-chat-folder-invite-link
+           #:chat-member-updated-chat
+           #:chat-member-updated-from
+           #:chat-member-updated-date
+           #:chat-member-updated-old-chat-member
+           #:chat-member-updated-new-chat-member
+           #:chat-member-updated-invite-link
+           #:chat-member-updated-via-chat-folder-invite-link
+           #:chat-member-updated-raw-data
            #:on-chat-member-updated))
 (in-package cl-telegram-bot/chat-member)
 
 
 (defclass chat-member-member ()
   ((status :initarg :status
-           :reader get-chat-member-member-status)
+           :reader chat-member-member-status)
    (user :initarg :from
-         :reader get-chat-member-member-user)
+         :reader chat-member-member-user)
    (raw-data :initarg :raw-data
-             :reader get-raw-data))
+             :reader chat-member-member-raw-data))
   (:documentation "https://core.telegram.org/bots/api#chatmembermember"))
 
 (defun make-chat-member-member (data)
@@ -61,23 +62,23 @@
 
 (defclass chat-member-updated ()
   ((chat :initarg :chat
-         :reader get-chat-member-updated-chat)
+         :reader chat-member-updated-chat)
    (from :initarg :from
-         :reader get-chat-member-updated-from)
+         :reader chat-member-updated-from)
    (date :initarg :date
-         :reader get-chat-member-updated-date)
+         :reader chat-member-updated-date)
    (old-chat-member :initarg :old-chat-member
-                    :reader get-chat-member-updated-old-chat-member)
+                    :reader chat-member-updated-old-chat-member)
    (new-chat-member :initarg :new-chat-member
-                    :reader get-chat-member-updated-new-chat-member)
+                    :reader chat-member-updated-new-chat-member)
    ;; TODO create a class for invite-link
    (invite-link :initarg :invite-link
-                :reader get-chat-member-updated-invite-link)
+                :reader chat-member-updated-invite-link)
    (via-chat-folder-invite-link
     :initarg :via-chat-folder-invite-link
-    :reader get-chat-member-updated-via-chat-folder-invite-link)
+    :reader chat-member-updated-via-chat-folder-invite-link)
    (raw-data :initarg :raw-data
-             :reader get-raw-data))
+             :reader chat-member-updated-raw-data))
   (:documentation "https://core.telegram.org/bots/api#chatmemberupdated"))
 
 (defun make-chat-member-updated (data)
