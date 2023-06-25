@@ -823,14 +823,11 @@ update will be processed."
         (on-message bot message))
     (reply-immediately (condition)
       (log:debug "Replying to message: ~S." message)
-      (let ((args
-              (append `(:reply-to-message-id ,(message-id message))
-                      (get-reply-args condition))))
-        (apply #'send-message
-               bot
-               (get-chat message)
-               (get-reply-text condition)
-               args))))
+      (apply #'send-message
+             bot
+             (get-chat message)
+             (get-reply-text condition)
+             (get-reply-args condition))))
   (values))
 
 (defun sender-id (message)
