@@ -1,7 +1,5 @@
 * cl-telegram-bot
-
-** Usage
-
-   
-
-** Installation
+  Library for interacting with the Telegram API. A fork of
+  https://github.com/40ants/cl-telegram-bot. Improvements include a
+  transparent project structure, ability to get message information
+  (rather than message text only) when reading messages, etc.
